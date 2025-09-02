@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: crossplane-system
+  labels:
+    app.kubernetes.io/name: crossplane
+    app.kubernetes.io/managed-by: argocd
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -18,14 +26,6 @@ spec:
     automated:
       prune: true
       selfHeal: true
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: crossplane-system
-  labels:
-    app.kubernetes.io/name: crossplane
-    app.kubernetes.io/managed-by: argocd
 ---
 apiVersion: pkg.crossplane.io/v1
 kind: Provider
