@@ -8,6 +8,7 @@ metadata:
 spec:
   forProvider:
     region: eu-west-1
+    locationConstraint: eu-west-1
     tags:
       Environment: poc
       CreatedBy: crossplane
