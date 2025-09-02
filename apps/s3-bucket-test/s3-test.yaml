@@ -1,0 +1,16 @@
+apiVersion: s3.aws.crossplane.io/v1beta1
+kind: Bucket
+metadata:
+  name: test-crossplane-bucket-poc
+  labels:
+    app: crossplane-test
+    environment: poc
+spec:
+  forProvider:
+    tags:
+      Environment: poc
+      CreatedBy: crossplane
+      Team: platform
+  providerConfigRef:
+    name: default
+  deletionPolicy: Delete
