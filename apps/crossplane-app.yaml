@@ -33,5 +33,5 @@ metadata:
   name: provider-aws
   namespace: crossplane-system
 spec:
-  package: xpkg.crossplane.io/crossplane-contrib/provider-aws:v0.54.2
+  package: xpkg.crossplane.io/crossplane-contrib/provider-aws:v0.52.6
 
