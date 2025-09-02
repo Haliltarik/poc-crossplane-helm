@@ -38,5 +38,4 @@ metadata:
 spec:
   credentials:
     source: InjectedIdentity
-  defaultRegion: eu-west-1
 ---
