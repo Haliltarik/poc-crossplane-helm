@@ -26,3 +26,12 @@ metadata:
   labels:
     app.kubernetes.io/name: crossplane
     app.kubernetes.io/managed-by: argocd
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws
+  namespace: crossplane-system
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.54.2
+
