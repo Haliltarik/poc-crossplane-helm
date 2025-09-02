@@ -4,6 +4,6 @@ metadata:
   name: test-crossplane-bucket
 spec:
   forProvider:
-    region: eu-west-1
+    locationConstraint: eu-west-1   # adapte la région
   providerConfigRef:
     name: default
