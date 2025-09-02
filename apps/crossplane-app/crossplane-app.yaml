@@ -33,10 +33,10 @@ spec:
     source: InjectedIdentity
   defaultRegion: eu-west-1
 ---
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-aws
-spec:
-  package: xpkg.crossplane.io/crossplane-contrib/provider-aws:v0.54.2
+# apiVersion: pkg.crossplane.io/v1
+# kind: Provider
+# metadata:
+#   name: provider-aws
+# spec:
+#   package: xpkg.crossplane.io/crossplane-contrib/provider-aws:v0.54.2
 ---
