@@ -33,3 +33,13 @@ metadata:
   name: provider-aws
 spec:
   package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.54.2
+---
+apiVersion: aws.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  credentials:
+    source: InjectedIdentity
+  defaultRegion: eu-west-1
+
