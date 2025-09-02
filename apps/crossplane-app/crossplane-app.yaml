@@ -6,6 +6,22 @@ metadata:
     app.kubernetes.io/name: crossplane
     app.kubernetes.io/managed-by: argocd
 ---
+apiVersion: aws.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  credentials:
+    source: InjectedIdentity
+  defaultRegion: eu-west-1
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: provider-aws
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.54.2
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -26,20 +42,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
----
-apiVersion: pkg.crossplane.io/v1
-kind: Provider
-metadata:
-  name: provider-aws
-spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-aws:v0.54.2
----
-apiVersion: aws.crossplane.io/v1beta1
-kind: ProviderConfig
-metadata:
-  name: default
-spec:
-  credentials:
-    source: InjectedIdentity
-  defaultRegion: eu-west-1
+
 
