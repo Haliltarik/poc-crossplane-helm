@@ -1,9 +1,0 @@
-apiVersion: s3.aws.crossplane.io/v1beta1
-kind: Bucket
-metadata:
-  name: test-crossplane-bucket
-spec:
-  forProvider:
-    locationConstraint: eu-west-1   # adapte la région
-  providerConfigRef:
-    name: default
