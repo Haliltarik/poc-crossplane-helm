@@ -56,7 +56,6 @@ spec:
   compositeTypeRef:
     apiVersion: aws.engie.com/v1alpha1
     kind: CompositeS3Bucket
-  mode: Resources
   resources:
     - name: s3bucket
       base:
