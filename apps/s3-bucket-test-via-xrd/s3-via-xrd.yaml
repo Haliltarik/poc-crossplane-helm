@@ -1,9 +1,9 @@
 apiVersion: aws.engie.com/v1alpha1
 kind: S3Bucket
 metadata:
-  name: test-crossplane-bucket-poc-xrd-407083967603-tamt
+  name: test-crossplane-bucket-claim
 spec:
-  bucketName: poc-crossplane-bucket-demo
+  bucketName: test-crossplane-bucket-poc-xrd-407083967603-tamt
   region: eu-west-1
   tags:
     Name: poc-crossplane-bucket
