@@ -56,6 +56,7 @@ spec:
   compositeTypeRef:
     apiVersion: aws.engie.com/v1alpha1
     kind: CompositeS3Bucket
+  mode: Resources   # 👈 Ajoute ça pour forcer le mode "resources"
   resources:
     - name: s3bucket
       base:
