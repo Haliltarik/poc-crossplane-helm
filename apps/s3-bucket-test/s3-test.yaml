@@ -4,7 +4,7 @@ metadata:
   name: test-bucket-clean
 spec:
   forProvider:
-    region: eu-west-1
+    locationConstraint: eu-west-1
   providerConfigRef:
     name: default
   deletionPolicy: Delete
