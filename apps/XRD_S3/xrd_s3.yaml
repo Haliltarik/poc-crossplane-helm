@@ -82,6 +82,8 @@ spec:
                     rules:
                       - applyServerSideEncryptionByDefault:
                           sseAlgorithm: AES256
+                  tagging:
+                    tagSet: []
                 providerConfigRef:
                   name: default
                 deletionPolicy: Delete
@@ -92,24 +94,10 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.region
                 toFieldPath: spec.forProvider.locationConstraint
-
-          - name: s3buckettagging
-            base:
-              apiVersion: s3.aws.crossplane.io/v1alpha1
-              kind: BucketTagging
-              spec:
-                forProvider:
-                  tagging:
-                    tagSet: []
-                providerConfigRef:
-                  name: default
-            patches:
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.bucketName
-                toFieldPath: spec.forProvider.bucket
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.tags
                 toFieldPath: spec.forProvider.tagging.tagSet
+
 
 
 
