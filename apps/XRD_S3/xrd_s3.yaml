@@ -63,44 +63,53 @@ spec:
   compositeTypeRef:
     apiVersion: aws.engie.com/v1alpha1
     kind: CompositeS3Bucket
-  resources:
-    - name: s3bucket
-      base:
-        apiVersion: s3.aws.crossplane.io/v1beta1
-        kind: Bucket
-        spec:
-          forProvider:
-            serverSideEncryptionConfiguration:
-              rules:
-                - applyServerSideEncryptionByDefault:
-                    sseAlgorithm: AES256
-          providerConfigRef:
-            name: default
-          deletionPolicy: Delete
-      patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.bucketName
-          toFieldPath: metadata.name
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.region
-          toFieldPath: spec.forProvider.locationConstraint
+  mode: Pipeline
+  pipeline:
+    - step: configure-s3
+      functionRef:
+        name: crossplane-contrib-function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: s3bucket
+            base:
+              apiVersion: s3.aws.crossplane.io/v1beta1
+              kind: Bucket
+              spec:
+                forProvider:
+                  serverSideEncryptionConfiguration:
+                    rules:
+                      - applyServerSideEncryptionByDefault:
+                          sseAlgorithm: AES256
+                providerConfigRef:
+                  name: default
+                deletionPolicy: Delete
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.bucketName
+                toFieldPath: metadata.name
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.region
+                toFieldPath: spec.forProvider.locationConstraint
 
-    - name: s3buckettagging
-      base:
-        apiVersion: s3.aws.crossplane.io/v1alpha1
-        kind: BucketTagging
-        spec:
-          forProvider:
-            tagging:
-              tagSet: []
-          providerConfigRef:
-            name: default
-      patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.bucketName
-          toFieldPath: spec.forProvider.bucket
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.tags
-          toFieldPath: spec.forProvider.tagging.tagSet
+          - name: s3buckettagging
+            base:
+              apiVersion: s3.aws.crossplane.io/v1alpha1
+              kind: BucketTagging
+              spec:
+                forProvider:
+                  tagging:
+                    tagSet: []
+                providerConfigRef:
+                  name: default
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.bucketName
+                toFieldPath: spec.forProvider.bucket
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.tags
+                toFieldPath: spec.forProvider.tagging.tagSet
+
 
 
