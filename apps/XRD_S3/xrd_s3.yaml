@@ -47,37 +47,4 @@ spec:
                       type: string
                     Environment:
                       type: string
----
-apiVersion: apiextensions.crossplane.io/v1
-kind: Composition
-metadata:
-  name: s3bucket-default
-spec:
-  compositeTypeRef:
-    apiVersion: aws.engie.com/v1alpha1
-    kind: CompositeS3Bucket
-  mode: Resources   # 👈 Ajoute ça pour forcer le mode "resources"
-  resources:
-    - name: s3bucket
-      base:
-        apiVersion: s3.aws.crossplane.io/v1beta1
-        kind: Bucket
-        spec:
-          forProvider:
-            serverSideEncryptionConfiguration:
-              rules:
-                - applyServerSideEncryptionByDefault:
-                    sseAlgorithm: AES256
-          providerConfigRef:
-            name: default
-          deletionPolicy: Delete
-      patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.bucketName
-          toFieldPath: metadata.name
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.region
-          toFieldPath: spec.forProvider.locationConstraint
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.tags
-          toFieldPath: spec.forProvider.tags
+
