@@ -1,0 +1,83 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: composites3buckets.aws.engie.com
+spec:
+  group: aws.engie.com
+  names:
+    kind: CompositeS3Bucket
+    plural: composites3buckets
+  claimNames:
+    kind: S3Bucket
+    plural: s3buckets
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              required:
+                - bucketName
+                - region
+                - tags
+              properties:
+                bucketName:
+                  type: string
+                region:
+                  type: string
+                tags:
+                  type: object
+                  required:
+                    - Name
+                    - ApplicationId
+                    - CostCenter
+                    - Environment
+                  properties:
+                    Name:
+                      type: string
+                    ApplicationId:
+                      type: string
+                    CostCenter:
+                      type: string
+                    Environment:
+                      type: string
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: composites3buckets.aws.engie.com
+spec:
+  compositeTypeRef:
+    apiVersion: aws.engie.com/v1alpha1
+    kind: CompositeS3Bucket
+  resources:
+    - name: s3bucket
+      base:
+        apiVersion: s3.aws.crossplane.io/v1beta1
+        kind: Bucket
+        spec:
+          forProvider:
+            serverSideEncryptionConfiguration:
+              rules:
+                - applyServerSideEncryptionByDefault:
+                    sseAlgorithm: AES256
+          providerConfigRef:
+            name: default
+          deletionPolicy: Delete
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.bucketName
+          toFieldPath: metadata.name
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.region
+          toFieldPath: spec.forProvider.locationConstraint
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.tags
+          toFieldPath: spec.forProvider.tags
+
