@@ -80,4 +80,3 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: spec.tags
           toFieldPath: spec.forProvider.tags
-
