@@ -6,7 +6,11 @@ spec:
   bucketName: test-crossplane-bucket-poc-xrd-407083967603-tamt
   region: eu-west-1
   tags:
-    Name: poc-crossplane-bucket
-    ApplicationId: APP-12345
-    CostCenter: CC-6789
-    Environment: dev
+    - key: Name
+      value: poc-crossplane-bucket
+    - key: ApplicationId
+      value: APP-12345
+    - key: CostCenter
+      value: CC-6789
+    - key: Environment
+      value: dev
