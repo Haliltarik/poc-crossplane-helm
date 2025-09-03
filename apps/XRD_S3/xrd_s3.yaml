@@ -48,6 +48,13 @@ spec:
                     Environment:
                       type: string
 ---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: crossplane-contrib-function-patch-and-transform
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.6.0
+---
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
@@ -56,27 +63,36 @@ spec:
   compositeTypeRef:
     apiVersion: aws.engie.com/v1alpha1
     kind: CompositeS3Bucket
-  resources:
-    - name: s3bucket
-      base:
-        apiVersion: s3.aws.crossplane.io/v1beta1
-        kind: Bucket
-        spec:
-          forProvider:
-            serverSideEncryptionConfiguration:
-              rules:
-                - applyServerSideEncryptionByDefault:
-                    sseAlgorithm: AES256
-          providerConfigRef:
-            name: default
-          deletionPolicy: Delete
-      patches:
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.bucketName
-          toFieldPath: metadata.name
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.region
-          toFieldPath: spec.forProvider.locationConstraint
-        - type: FromCompositeFieldPath
-          fromFieldPath: spec.tags
-          toFieldPath: spec.forProvider.tags
+  mode: Pipeline
+  pipeline:
+    - step: configure-s3
+      functionRef:
+        name: crossplane-contrib-function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: s3bucket
+            base:
+              apiVersion: s3.aws.crossplane.io/v1beta1
+              kind: Bucket
+              spec:
+                forProvider:
+                  serverSideEncryptionConfiguration:
+                    rules:
+                      - applyServerSideEncryptionByDefault:
+                          sseAlgorithm: AES256
+                providerConfigRef:
+                  name: default
+                deletionPolicy: Delete
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.bucketName
+                toFieldPath: metadata.name
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.region
+                toFieldPath: spec.forProvider.locationConstraint
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.tags
+                toFieldPath: spec.forProvider.tags
+
