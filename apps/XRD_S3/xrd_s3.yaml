@@ -32,21 +32,17 @@ spec:
                 region:
                   type: string
                 tags:
-                  type: object
-                  required:
-                    - Name
-                    - ApplicationId
-                    - CostCenter
-                    - Environment
-                  properties:
-                    Name:
-                      type: string
-                    ApplicationId:
-                      type: string
-                    CostCenter:
-                      type: string
-                    Environment:
-                      type: string
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - key
+                      - value
+                    properties:
+                      key:
+                        type: string
+                      value:
+                        type: string
 ---
 apiVersion: pkg.crossplane.io/v1beta1
 kind: Function
