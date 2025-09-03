@@ -51,7 +51,7 @@ spec:
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: composites3buckets.aws.engie.com
+  name: s3bucket-default
 spec:
   compositeTypeRef:
     apiVersion: aws.engie.com/v1alpha1
