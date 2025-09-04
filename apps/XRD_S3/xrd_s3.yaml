@@ -93,7 +93,60 @@ spec:
               - type: FromCompositeFieldPath
                 fromFieldPath: spec.tags
                 toFieldPath: spec.forProvider.tagging.tagSet
-
+          - name: s3bucketpolicy
+            base:
+              apiVersion: s3.aws.crossplane.io/v1beta1
+              kind: BucketPolicy
+              spec:
+                forProvider:
+                  policy: |
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Sid": "enforce-tls-12-requests-only",
+                          "Effect": "Deny",
+                          "Principal": {
+                            "AWS": "*"
+                          },
+                          "Action": "*",
+                          "Resource": [
+                            "arn:aws:s3:::{{bucketName}}/*",
+                            "arn:aws:s3:::{{bucketName}}"
+                          ],
+                          "Condition": {
+                            "NumericLessThan": {
+                              "s3:TlsVersion": "1.2"
+                            }
+                          }
+                        },
+                        {
+                          "Sid": "enforce-tls-requests-only",
+                          "Effect": "Deny",
+                          "Principal": {
+                            "AWS": "*"
+                          },
+                          "Action": "*",
+                          "Resource": [
+                            "arn:aws:s3:::{{bucketName}}/*",
+                            "arn:aws:s3:::{{bucketName}}"
+                          ],
+                          "Condition": {
+                            "Bool": {
+                              "aws:SecureTransport": "false"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  bucketNameRef:
+                    name: "" # patched dynamiquement
+                providerConfigRef:
+                  name: default
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: spec.bucketName
+                toFieldPath: spec.forProvider.bucketNameRef.name
 
 
 
