@@ -51,33 +51,54 @@ metadata:
 spec:
   package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.6.0
 ---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: crossplane-contrib-function-go-templating
+  namespace: crossplane-system
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-go-templating:v0.5.0
+---
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
   name: s3bucket-default
+  namespace: crossplane-system
 spec:
   compositeTypeRef:
     apiVersion: aws.engie.com/v1alpha1
     kind: CompositeS3Bucket
   mode: Pipeline
   pipeline:
-    - step: configure-s3
+    - step: render-s3
       functionRef:
-        name: crossplane-contrib-function-patch-and-transform
+        name: crossplane-contrib-function-go-templating
       input:
-        apiVersion: pt.fn.crossplane.io/v1beta1
-        kind: Resources
-        resources:
-          - name: s3bucket
-            base:
+        apiVersion: gotemplate.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        templates:
+          - base:
               apiVersion: s3.aws.crossplane.io/v1beta1
               kind: Bucket
+              metadata:
+                name: {{ .observed.composite.spec.bucketName }}
               spec:
                 forProvider:
+                  locationConstraint: {{ .observed.composite.spec.region }}
                   serverSideEncryptionConfiguration:
                     rules:
                       - applyServerSideEncryptionByDefault:
                           sseAlgorithm: AES256
+                  tagging:
+                    tagSet:
+                      - key: Name
+                        value: {{ (index .observed.composite.spec.tags 0).value }}
+                      - key: ApplicationId
+                        value: {{ (index .observed.composite.spec.tags 1).value }}
+                      - key: CostCenter
+                        value: {{ (index .observed.composite.spec.tags 2).value }}
+                      - key: Environment
+                        value: {{ (index .observed.composite.spec.tags 3).value }}
                   policy: |
                     {
                       "Version": "2012-10-17",
@@ -88,8 +109,8 @@ spec:
                           "Principal": { "AWS": "*" },
                           "Action": "*",
                           "Resource": [
-                            "arn:aws:s3:::{{bucketName}}/*",
-                            "arn:aws:s3:::{{bucketName}}"
+                            "arn:aws:s3:::{{ .observed.composite.spec.bucketName }}/*",
+                            "arn:aws:s3:::{{ .observed.composite.spec.bucketName }}"
                           ],
                           "Condition": {
                             "NumericLessThan": { "s3:TlsVersion": "1.2" }
@@ -101,8 +122,8 @@ spec:
                           "Principal": { "AWS": "*" },
                           "Action": "*",
                           "Resource": [
-                            "arn:aws:s3:::{{bucketName}}/*",
-                            "arn:aws:s3:::{{bucketName}}"
+                            "arn:aws:s3:::{{ .observed.composite.spec.bucketName }}/*",
+                            "arn:aws:s3:::{{ .observed.composite.spec.bucketName }}"
                           ],
                           "Condition": {
                             "Bool": { "aws:SecureTransport": "false" }
@@ -113,10 +134,3 @@ spec:
                 providerConfigRef:
                   name: default
                 deletionPolicy: Delete
-            patches:
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.bucketName
-                toFieldPath: metadata.name
-              - type: FromCompositeFieldPath
-                fromFieldPath: spec.region
-                toFieldPath: spec.forProvider.locationConstraint
