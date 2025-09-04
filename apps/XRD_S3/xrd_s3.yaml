@@ -58,4 +58,80 @@ metadata:
   namespace: crossplane-system
 spec:
   package: xpkg.upbound.io/crossplane-contrib/function-go-templating:v0.5.0
-
+---
+---
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: s3bucket-default
+  namespace: crossplane-system
+spec:
+  compositeTypeRef:
+    apiVersion: aws.engie.com/v1alpha1
+    kind: CompositeS3Bucket
+  mode: Pipeline
+  pipeline:
+    - step: render-s3
+      functionRef:
+        name: crossplane-contrib-function-go-templating
+      input:
+        apiVersion: gotemplate.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        templates:
+          - base:
+              apiVersion: s3.aws.crossplane.io/v1beta1
+              kind: Bucket
+              metadata:
+                name: {{ .observed.composite.spec.bucketName }}
+              spec:
+                forProvider:
+                  locationConstraint: {{ .observed.composite.spec.region }}
+                  serverSideEncryptionConfiguration:
+                    rules:
+                      - applyServerSideEncryptionByDefault:
+                          sseAlgorithm: AES256
+                  tagging:
+                    tagSet:
+                      - key: Name
+                        value: {{ (index .observed.composite.spec.tags 0).value }}
+                      - key: ApplicationId
+                        value: {{ (index .observed.composite.spec.tags 1).value }}
+                      - key: CostCenter
+                        value: {{ (index .observed.composite.spec.tags 2).value }}
+                      - key: Environment
+                        value: {{ (index .observed.composite.spec.tags 3).value }}
+                  policy: |
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Sid": "enforce-tls-12-requests-only",
+                          "Effect": "Deny",
+                          "Principal": { "AWS": "*" },
+                          "Action": "*",
+                          "Resource": [
+                            "arn:aws:s3:::{{ .observed.composite.spec.bucketName }}/*",
+                            "arn:aws:s3:::{{ .observed.composite.spec.bucketName }}"
+                          ],
+                          "Condition": {
+                            "NumericLessThan": { "s3:TlsVersion": "1.2" }
+                          }
+                        },
+                        {
+                          "Sid": "enforce-tls-requests-only",
+                          "Effect": "Deny",
+                          "Principal": { "AWS": "*" },
+                          "Action": "*",
+                          "Resource": [
+                            "arn:aws:s3:::{{ .observed.composite.spec.bucketName }}/*",
+                            "arn:aws:s3:::{{ .observed.composite.spec.bucketName }}"
+                          ],
+                          "Condition": {
+                            "Bool": { "aws:SecureTransport": "false" }
+                          }
+                        }
+                      ]
+                    }
+                providerConfigRef:
+                  name: default
+                deletionPolicy: Delete
